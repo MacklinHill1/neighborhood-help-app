@@ -20,6 +20,13 @@ export default function Homepage() {
         >
           Sign Up
         </button>
+
+        <button 
+          className="auth-btn" 
+          onClick={() => navigate("/UserProfile")}
+        >
+          User Profile
+        </button>
         
       </div>
 
