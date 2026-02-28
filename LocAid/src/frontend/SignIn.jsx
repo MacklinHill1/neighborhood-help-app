@@ -48,6 +48,9 @@ export default function SignIn() {
           <button className="btn-form-submit" type="submit" disabled={loading}>
             {loading ? 'Logging in...' : '📍 Log In'}
           </button>
+          <p className="modal-switch">Don't have an account?{" "}
+            <button type="button" onClick={() => navigate('/signup')}>Sign up</button>
+            </p>
         </form>
       </div>
     </div>

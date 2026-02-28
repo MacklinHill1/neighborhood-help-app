@@ -17,7 +17,13 @@ export default function Signup() {
     setLoading(true);
     setMessage("");
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+  email,
+  password,
+  options: {
+    emailRedirectTo: `${window.location.origin}/signin`,
+  }
+});
     if (error) {
       setMessage(error.message);
       setLoading(false);
@@ -60,6 +66,9 @@ export default function Signup() {
           <button className="btn-form-submit" type="submit" disabled={loading}>
             {loading ? 'Creating account...' : '🌿 Create Account'}
           </button>
+          <p className="modal-switch">Already have an account?{" "}
+            <button type="button" onClick={() => navigate('/signin')}>Log in</button>
+            </p>
         </form>
       </div>
     </div>
