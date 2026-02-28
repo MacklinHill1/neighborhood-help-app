@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from './supabaseClient';
 import "./Homepage.css";
 
-export default function Signup() {
+export default function SignIn() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [zip, setZip] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,38 +15,28 @@ export default function Signup() {
     setLoading(true);
     setMessage("");
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setMessage(error.message);
       setLoading(false);
       return;
     }
 
-    await supabase.from('profiles').insert({ id: data.user.id, full_name: name, zip_code: zip });
-
-    setMessage('Account created! Check your email to confirm.');
+    setMessage('Logged in successfully!');
     setLoading(false);
-    navigate('/signin');
+    navigate('/');
   }
 
   return (
     <div className="modal-overlay">
       <div className="modal-card">
-        <h2 className="modal-title">Join LocAid</h2>
-        <p className="modal-subtitle">Start connecting with your neighborhood</p>
+        <h2 className="modal-title">Welcome Back</h2>
+        <p className="modal-subtitle">Log in to connect with your neighbors</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Full Name</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" required />
-          </div>
-          <div className="form-group">
             <label>Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
-          </div>
-          <div className="form-group">
-            <label>Area / Zip Code 📍</label>
-            <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g. 90210" required />
           </div>
           <div className="form-group">
             <label>Password</label>
@@ -58,7 +46,7 @@ export default function Signup() {
           {message && <p className="modal-message">{message}</p>}
 
           <button className="btn-form-submit" type="submit" disabled={loading}>
-            {loading ? 'Creating account...' : '🌿 Create Account'}
+            {loading ? 'Logging in...' : '📍 Log In'}
           </button>
         </form>
       </div>
