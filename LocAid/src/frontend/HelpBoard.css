@@ -171,21 +171,43 @@
   color: var(--text-mid);
   font-weight: 300;
 }
-.helpboard-delete-btn {
-  margin-top: 10px;
-  background: none;
-  border: 1.5px solid #e0a0a0;
-  color: #b05555;
-  font-family: 'Lato', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
+
+.zip-prompt-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0 24px;
 }
 
-.helpboard-delete-btn:hover {
-  background: #fdf0f0;
-  border-color: #c06060;
+.zip-prompt-card {
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+}
+
+.zip-prompt-card .form-group {
+  text-align: left;
+}
+
+.zip-error {
+  display: block;
+  color: #b05555;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.zip-change-btn {
+  background: none;
+  border: none;
+  color: var(--teal-mid);
+  font-family: 'Lato', sans-serif;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.zip-change-btn:hover {
+  color: var(--teal-dark);
 }
