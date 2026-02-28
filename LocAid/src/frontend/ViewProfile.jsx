@@ -8,6 +8,13 @@ export default function ViewProfile() {
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUserId(session?.user?.id ?? null);
+    });
+  }, []);
 
   useEffect(() => {
     async function loadProfile() {
@@ -93,6 +100,17 @@ export default function ViewProfile() {
           <h1 className="profile-page-title">{profile.full_name || 'LocAid Member'}</h1>
           {profile.zip_code && (
             <p className="view-location">📍 {profile.zip_code}</p>
+          )}
+
+          {/* Message button — only show if logged in and not your own profile */}
+          {currentUserId && currentUserId !== id && (
+            <button
+              className="btn-form-submit"
+              style={{ marginTop: '12px', width: 'auto', padding: '10px 32px' }}
+              onClick={() => navigate(`/chat/${id}`)}
+            >
+              💬 Message
+            </button>
           )}
         </div>
 
