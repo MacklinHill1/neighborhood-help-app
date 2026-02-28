@@ -7,20 +7,7 @@ export default function Homepage() {
 
   return (
     <main className="homepage">
-      {/* Buttons at the top (optional, could be removed if nav already has them) */}
-      <div className="button-container">
-        <button className="auth-btn" onClick={() => navigate("/signin")}>
-          Sign In
-        </button>
 
-        <button className="auth-btn" onClick={() => navigate("/signup")}>
-          Sign Up
-        </button>
-
-        <button className="auth-btn" onClick={() => navigate("/UserProfile")}>
-          User Profile
-        </button>
-      </div>
 
       {/* Background shapes */}
       <div className="bg-shape bg-shape-1" />
@@ -39,6 +26,13 @@ export default function Homepage() {
           <button className="btn-signup" onClick={() => navigate("/signup")}>
             Sign Up
           </button>
+           <button
+    className="btn-tertiary-hero"
+    onClick={() => navigate("/board")}
+    style={{ marginLeft: "10px", backgroundColor: "#6c63ff", color: "#fff" }}
+  >
+    📝 View Help Board
+  </button>
         </div>
       </nav>
 
