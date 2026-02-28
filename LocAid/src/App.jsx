@@ -1,30 +1,30 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Homepage from './frontend/Homepage';
-// Import your future pages here:
 import SignIn from './frontend/SignIn';
 import SignUp from './frontend/Signup';
 import UserProfile from './frontend/UserProfile.jsx';
 import HelpBoard from './frontend/HelpBoard';
 import ViewProfile from './frontend/ViewProfile';
-
-// import HelpBoard from './frontend/HelpBoard'; 
+import Chat from './frontend/Chat';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* The "Main" landing page */}
         <Route path="/" element={<Homepage />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="userprofile" element={<UserProfile />} />
-        <Route path="/board" element={<HelpBoard />} />
+        
+        {/* Fixed: Added leading slash */}
+        <Route path="/userprofile" element={<UserProfile />} />
         <Route path="/profile" element={<UserProfile />} />
+        
+        <Route path="/board" element={<HelpBoard />} />
         <Route path="/user/:id" element={<ViewProfile />} />
-
-        {/* Example of a second page (Create this file next!) */}
-        {/* <Route path="/board" element={<HelpBoard />} /> */}
+        
+        {/* Fixed: Removed the crashing supabase.auth.user() call */}
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </Router>
   );

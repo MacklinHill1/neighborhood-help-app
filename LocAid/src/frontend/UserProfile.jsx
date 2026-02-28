@@ -45,7 +45,7 @@ export default function UserProfile() {
     }
 
     loadProfile();
-  }, []);
+  }, [navigate]);
 
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
