@@ -63,6 +63,8 @@ export default function Homepage() {
   <>
     <button className="btn-login" onClick={() => navigate('/signin')}>Log In</button>
     <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
+    <button className="btn-HelpBoard" onClick={() => navigate('/board')}>Help Board</button>
+
   </>
 )}
           </div>
