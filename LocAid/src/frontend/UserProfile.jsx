@@ -5,7 +5,6 @@ import "./UserProfile.css";
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const [, setProfilePic] = useState(null);
   const [preview, setPreview] = useState(null);
   const [skills, setSkills] = useState("");
   const [about, setAbout] = useState("");
@@ -25,29 +24,46 @@ export default function UserProfile() {
       setUserId(session.user.id);
 
       const { data } = await supabase
-        .from('profiles')
-        .select('bio, skills, school, degree, employer, job_title')
-        .eq('id', session.user.id)
-        .maybeSingle();
+  .from('profiles')
+  .select('bio, skills, school, degree, employer, job_title, avatar_url')
+  .eq('id', session.user.id)
+  .maybeSingle();
 
-      if (data) {
-        setAbout(data.bio || "");
-        setSkills(data.skills || "");
-        setSchool(data.school || "");
-        setDegree(data.degree || "");
-        setEmployer(data.employer || "");
-        setJobTitle(data.job_title || "");
-      }
+if (data) {
+  setAbout(data.bio || "");
+  setSkills(data.skills || "");
+  setSchool(data.school || "");
+  setDegree(data.degree || "");
+  setEmployer(data.employer || "");
+  setJobTitle(data.job_title || "");
+  setPreview(data.avatar_url || null);
+}
     }
 
     loadProfile();
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setProfilePic(file);
-    if (file) setPreview(URL.createObjectURL(file));
-  };
+  const handleImageChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return;
+
+  const filePath = `${session.user.id}/${file.name}`;
+
+  const { error } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true });
+
+  if (error) { console.error(error.message); return; }
+
+  const { data } = supabase.storage
+    .from('avatars')
+    .getPublicUrl(filePath);
+
+  setPreview(data.publicUrl);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +79,7 @@ export default function UserProfile() {
     degree: degree,
     employer: employer,
     job_title: jobTitle,
+    avatar_url: preview,
   }, { onConflict: 'id' });
 
     if (error) {
