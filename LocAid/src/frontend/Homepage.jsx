@@ -10,13 +10,13 @@ export default function Homepage() {
 
   useEffect(() => {
     async function fetchProfile(userId) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('full_name')
-      .eq('id', userId)
-      .single();
-    setProfile(data);
-  }
+  const { data } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', userId)
+    .maybeSingle();
+  setProfile(data);
+}
     // Get session on load
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -54,16 +54,17 @@ export default function Homepage() {
           <div className="nav-brand">Loc<span>Aid</span> 📍</div>
           <div className="nav-buttons">
             {user ? (
-              <>
-                <span className="nav-welcome">👋 Welcome, {profile?.full_name || user.email}</span>
-                <button className="btn-login" onClick={handleSignOut}>Sign Out</button>
-              </>
-            ) : (
-              <>
-                <button className="btn-login" onClick={() => navigate('/signin')}>Log In</button>
-                <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
-              </>
-            )}
+  <>
+    <span className="nav-welcome">👋 Welcome, {profile?.full_name || user.email}</span>
+    <button className="btn-signup" onClick={() => navigate('/profile')}>Profile</button>
+    <button className="btn-login" onClick={handleSignOut}>Sign Out</button>
+  </>
+) : (
+  <>
+    <button className="btn-login" onClick={() => navigate('/signin')}>Log In</button>
+    <button className="btn-signup" onClick={() => navigate('/signup')}>Sign Up</button>
+  </>
+)}
           </div>
         </nav>
 
@@ -88,14 +89,16 @@ export default function Homepage() {
             LocAid is a hyperlocal community platform where neighbors connect to trade skills and lend a hand. Whether you're offering a talent or seeking assistance, LocAid turns your neighborhood into a supportive network of mutual aid.
           </p>
 
-          <div className="hero-cta-row">
-            <button className="btn-primary-hero" onClick={() => navigate('/signup')}>
-              🏡 Join Your Community
-            </button>
-            <button className="btn-secondary-hero" onClick={() => navigate('/signin')}>
-              Sign In →
-            </button>
-          </div>
+          {!user && (
+  <div className="hero-cta-row">
+    <button className="btn-primary-hero" onClick={() => navigate('/signup')}>
+      🏡 Join Your Community
+    </button>
+    <button className="btn-secondary-hero" onClick={() => navigate('/signin')}>
+      Sign In →
+    </button>
+  </div>
+)}
         </section>
 
         {/* Feature Cards */}
