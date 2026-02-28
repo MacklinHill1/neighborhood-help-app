@@ -7,7 +7,8 @@ import SignUp from './frontend/Signup';
 import UserProfile from './frontend/UserProfile.jsx';
 import HelpBoard from './frontend/HelpBoard';
 import ViewProfile from './frontend/ViewProfile';
-
+import Chat from './frontend/Chat'
+import supabase from './frontend/supabaseClient.js'
 // import HelpBoard from './frontend/HelpBoard'; 
 
 function App() {
@@ -22,7 +23,9 @@ function App() {
         <Route path="/board" element={<HelpBoard />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/user/:id" element={<ViewProfile />} />
-
+        <Route
+        path="/chat" element={<Chat currentUser={supabase.auth.user()} />}
+/>
         {/* Example of a second page (Create this file next!) */}
         {/* <Route path="/board" element={<HelpBoard />} /> */}
       </Routes>
