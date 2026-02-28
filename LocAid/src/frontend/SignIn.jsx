@@ -30,6 +30,23 @@ export default function SignIn() {
   return (
     <div className="modal-overlay">
       <div className="modal-card">
+        {/* Close X Button */}
+        <button
+          className="modal-close-btn"
+          onClick={() => navigate('/')}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            border: "none",
+            background: "transparent",
+            fontSize: "1.5rem",
+            cursor: "pointer"
+          }}
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <h2 className="modal-title">Welcome Back</h2>
         <p className="modal-subtitle">Log in to connect with your neighbors</p>
 
