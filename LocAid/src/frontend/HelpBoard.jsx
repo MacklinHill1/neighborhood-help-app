@@ -1,37 +1,59 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from './supabaseClient';
+import "./Homepage.css";
+import "./HelpBoard.css";
 
-export default function HelpBoard({ userId }) {
+export default function HelpBoard() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+  const [saved, setSaved] = useState(false);
 
-  // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [type, setType] = useState("need"); // default
-
-  // Fetch requests from Supabase
-  const fetchRequests = async () => {
-    const { data, error } = await supabase
-      .from("requests")
-      .select("*")
-      .order("id", { ascending: false });
-
-    if (error) console.error("Error fetching requests:", error);
-    else setRequests(data);
-
-    setLoading(false);
-  };
+  const [type, setType] = useState("need");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-  // define async function inside effect
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) setUserId(session.user.id);
+      await fetchRequests();
+    }
+    init();
+  }, []);
+
+  const handleDelete = async (requestId) => {
+  const { error } = await supabase
+    .from('requests')
+    .delete()
+    .eq('id', requestId)
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error(error.message);
+  } else {
+    setRequests(prev => prev.filter(r => r.id !== requestId));
+  }
+};
+
   const fetchRequests = async () => {
     try {
       const { data, error } = await supabase
         .from("requests")
-        .select("*")
-        .order("id", { ascending: false });
+        .select(`
+          *,
+          profiles (
+            first_name,
+            last_name,
+            full_name,
+            avatar_url
+          )
+        `)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setRequests(data);
@@ -42,117 +64,213 @@ export default function HelpBoard({ userId }) {
     }
   };
 
-  fetchRequests();
-}, []);
-  // Submit a new request
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!userId) { navigate('/signin'); return; }
+    setSubmitting(true);
 
-    if (!title || !category || !type) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    const { error } = await supabase.from("requests").insert([
-      {
-        title,
-        description,
-        category,
-        type,
-        user_id: userId, // passed from your auth/session
-      },
-    ]);
+    const { error } = await supabase.from("requests").insert([{
+      title,
+      description,
+      category,
+      type,
+      user_id: userId,
+    }]);
 
     if (error) {
       console.error("Error adding request:", error);
-      alert("Failed to post request!");
     } else {
-      alert("Request posted!");
       setTitle("");
       setDescription("");
       setCategory("");
       setType("need");
-      fetchRequests(); // refresh list
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      await fetchRequests();
     }
+
+    setSubmitting(false);
   };
 
-  if (loading) return <p>Loading requests...</p>;
+  function formatTime(timestamp) {
+  if (!timestamp) return '';
+  // Append Z to treat as UTC since Supabase returns UTC without timezone
+  const date = new Date(timestamp.endsWith('Z') ? timestamp : timestamp + 'Z');
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+  function getDisplayName(profile) {
+    if (!profile) return 'LocAid Member';
+    if (profile.first_name || profile.last_name) {
+      return `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+    }
+    return profile.full_name || 'LocAid Member';
+  }
 
   return (
-    <main style={{ padding: "20px" }}>
-      <h2>Help Board</h2>
+    <div className="homepage">
 
-      {/* Post Request Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
-        <h3>Post a New Request</h3>
+      <div className="bg-shape bg-shape-1" />
+      <div className="bg-shape bg-shape-2" />
+      <div className="bg-shape bg-shape-3" />
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Title: </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            placeholder="e.g., Mow Lawn"
-          />
+      <nav className="nav">
+        <div className="nav-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          Loc<span>Aid</span> 📍
+        </div>
+        <div className="nav-buttons">
+          <button className="btn-login" onClick={() => navigate('/')}>← Back Home</button>
+        </div>
+      </nav>
+
+      <div className="profile-page">
+
+        <div className="profile-page-header">
+          <div className="hero-badge">🤝 Community Help Board</div>
+          <h1 className="profile-page-title">Help Board</h1>
+          <p className="profile-page-subtitle">Post a request or offer your skills to your neighbors</p>
         </div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Description: </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Add details about the favor..."
-          />
-        </div>
+        <div className="profile-sections-wrap">
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Category: </label>
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            placeholder="Errands, Tech, Labor..."
-          />
-        </div>
+          {/* Post form */}
+          {userId ? (
+            <div className="profile-section-card">
+              <div className="profile-section-heading">
+                <span className="profile-section-icon">📋</span>
+                <h3>Post a Request</h3>
+              </div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <label>Type: </label>
-          <select value={type} onChange={(e) => setType(e.target.value)} required>
-            <option value="need">Need Help</option>
-            <option value="offer">Offer Help</option>
-          </select>
-        </div>
+              <form onSubmit={handleSubmit}>
+                <div className="helpboard-form-grid">
+                  <div className="form-group">
+                    <label>Title</label>
+                    <input
+                      type="text"
+                      value={title}
+                      onChange={e => setTitle(e.target.value)}
+                      placeholder="e.g. Need help mowing lawn"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Category</label>
+                    <input
+                      type="text"
+                      value={category}
+                      onChange={e => setCategory(e.target.value)}
+                      placeholder="e.g. Errands, Tech, Labor"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Type</label>
+                    <select className="helpboard-select" value={type} onChange={e => setType(e.target.value)} required>
+                      <option value="need">🙋 Need Help</option>
+                      <option value="offer">🤲 Offer Help</option>
+                    </select>
+                  </div>
+                </div>
 
-        <button type="submit">Post Request</button>
-      </form>
+                <div className="form-group" style={{ marginTop: '4px' }}>
+                  <label>Description</label>
+                  <textarea
+                    className="profile-textarea"
+                    rows="3"
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                    placeholder="Add details about what you need or offer..."
+                  />
+                </div>
 
-      {/* Display Requests */}
-      <div>
-        {requests.length === 0 && <p>No requests yet!</p>}
-        {requests.map((req) => (
-          <div
-            key={req.id}
-            style={{
-              border: "1px solid #ccc",
-              marginBottom: "10px",
-              padding: "10px",
-              borderRadius: "5px",
-            }}
-          >
-            <h3>{req.title}</h3>
-            <p>{req.description}</p>
-            <p>
-              <strong>Category:</strong> {req.category} | <strong>Type:</strong>{" "}
-              {req.type}
-            </p>
-            <p>
-              <em>Posted by: {req.user_id}</em>
-            </p>
+                <div className="profile-save-row" style={{ marginTop: '8px' }}>
+                  <button className="btn-form-submit profile-save-btn" type="submit" disabled={submitting}>
+                    {submitting ? 'Posting...' : '📌 Post Request'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="profile-section-card" style={{ textAlign: 'center' }}>
+              
+              <p style={{ fontFamily: 'Lato, sans-serif', color: 'var(--text-mid)', marginBottom: '16px' }}>
+                🔒 Sign in to post a request
+              </p>
+              <button className="btn-form-submit" style={{ width: 'auto', padding: '10px 28px' }} onClick={() => navigate('/signin')}>
+                Log In
+              </button>
+            </div>
+          )}
+
+          {/* Requests list */}
+          <div className="profile-section-card">
+            <div className="profile-section-heading">
+              <span className="profile-section-icon">📌</span>
+              <h3>Active Requests</h3>
+            </div>
+
+            {loading && <p className="helpboard-empty">Loading...</p>}
+            {!loading && requests.length === 0 && (
+              <p className="helpboard-empty">No requests yet — be the first to post!</p>
+            )}
+
+            <div className="helpboard-list">
+              {requests.map(req => (
+                <div key={req.id} className={`helpboard-card ${req.type === 'offer' ? 'helpboard-offer' : 'helpboard-need'}`}>
+
+                  {/* Poster info */}
+                  <div className="helpboard-poster" onClick={() => navigate(`/user/${req.user_id}`)}>
+                    {req.profiles?.avatar_url ? (
+                      <img src={req.profiles.avatar_url} alt="avatar" className="helpboard-avatar" />
+                    ) : (
+                      <div className="helpboard-avatar-placeholder">👤</div>
+                    )}
+                    <div className="helpboard-poster-info">
+                      <span className="helpboard-poster-name">
+                        {getDisplayName(req.profiles)}
+                      </span>
+                      <span className="helpboard-time">{formatTime(req.created_at)}</span>
+                    </div>
+                  </div>
+
+                  {/* Post content */}
+                  <div className="helpboard-card-top">
+                    <span className={`helpboard-badge ${req.type === 'offer' ? 'badge-offer' : 'badge-need'}`}>
+                      {req.type === 'offer' ? '🤲 Offering' : '🙋 Needs Help'}
+                    </span>
+                    <span className="helpboard-category">{req.category}</span>
+                  </div>
+                  <h3 className="helpboard-title">{req.title}</h3>
+                  {req.description && <p className="helpboard-desc">{req.description}</p>}
+                  {req.user_id === userId && (
+                  <button
+                     className="helpboard-delete-btn"
+                     onClick={() => handleDelete(req.id)}
+>
+                    🗑️ Delete
+                 </button>
+                )}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
+
+        </div>
       </div>
-    </main>
+
+      {saved && (
+        <div className="save-toast">
+          📌 Request posted successfully!
+        </div>
+      )}
+
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import SignIn from './frontend/SignIn';
 import SignUp from './frontend/Signup';
 import UserProfile from './frontend/UserProfile.jsx';
 import HelpBoard from './frontend/HelpBoard';
+import ViewProfile from './frontend/ViewProfile';
 
 // import HelpBoard from './frontend/HelpBoard'; 
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="userprofile" element={<UserProfile />} />
         <Route path="/board" element={<HelpBoard />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/user/:id" element={<ViewProfile />} />
 
         {/* Example of a second page (Create this file next!) */}
         {/* <Route path="/board" element={<HelpBoard />} /> */}

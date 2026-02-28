@@ -6,6 +6,8 @@ import "./UserProfile.css";
 export default function UserProfile() {
   const navigate = useNavigate();
   const [preview, setPreview] = useState(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [skills, setSkills] = useState("");
   const [about, setAbout] = useState("");
   const [school, setSchool] = useState("");
@@ -24,63 +26,68 @@ export default function UserProfile() {
       setUserId(session.user.id);
 
       const { data } = await supabase
-  .from('profiles')
-  .select('bio, skills, school, degree, employer, job_title, avatar_url')
-  .eq('id', session.user.id)
-  .maybeSingle();
+        .from('profiles')
+        .select('first_name, last_name, bio, skills, school, degree, employer, job_title, avatar_url')
+        .eq('id', session.user.id)
+        .maybeSingle();
 
-if (data) {
-  setAbout(data.bio || "");
-  setSkills(data.skills || "");
-  setSchool(data.school || "");
-  setDegree(data.degree || "");
-  setEmployer(data.employer || "");
-  setJobTitle(data.job_title || "");
-  setPreview(data.avatar_url || null);
-}
+      if (data) {
+        setFirstName(data.first_name || "");
+        setLastName(data.last_name || "");
+        setAbout(data.bio || "");
+        setSkills(data.skills || "");
+        setSchool(data.school || "");
+        setDegree(data.degree || "");
+        setEmployer(data.employer || "");
+        setJobTitle(data.job_title || "");
+        setPreview(data.avatar_url || null);
+      }
     }
 
     loadProfile();
   }, []);
 
   const handleImageChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-  const filePath = `${session.user.id}/${file.name}`;
+    const filePath = `${session.user.id}/${file.name}`;
 
-  const { error } = await supabase.storage
-    .from('avatars')
-    .upload(filePath, file, { upsert: true });
+    const { error } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
 
-  if (error) { console.error(error.message); return; }
+    if (error) { console.error(error.message); return; }
 
-  const { data } = supabase.storage
-    .from('avatars')
-    .getPublicUrl(filePath);
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
 
-  setPreview(data.publicUrl);
-};
+    setPreview(data.publicUrl);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const { error } = await supabase
-  .from('profiles')
-  .upsert({
-    id: userId,
-    bio: about,
-    skills: skills,
-    school: school,
-    degree: degree,
-    employer: employer,
-    job_title: jobTitle,
-    avatar_url: preview,
-  }, { onConflict: 'id' });
+      .from('profiles')
+      .upsert({
+        id: userId,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: `${firstName} ${lastName}`.trim(),
+        bio: about,
+        skills: skills,
+        school: school,
+        degree: degree,
+        employer: employer,
+        job_title: jobTitle,
+        avatar_url: preview,
+      }, { onConflict: 'id' });
 
     if (error) {
       console.error(error.message);
@@ -95,12 +102,10 @@ if (data) {
   return (
     <div className="homepage">
 
-      {/* Background shapes */}
       <div className="bg-shape bg-shape-1" />
       <div className="bg-shape bg-shape-2" />
       <div className="bg-shape bg-shape-3" />
 
-      {/* Nav */}
       <nav className="nav">
         <div className="nav-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           Loc<span>Aid</span> 📍
@@ -110,10 +115,8 @@ if (data) {
         </div>
       </nav>
 
-      {/* Full page profile content */}
       <div className="profile-page">
 
-        {/* Page header */}
         <div className="profile-page-header">
           <div className="hero-badge">🏡 Your LocAid Profile</div>
           <h1 className="profile-page-title">Edit Profile</h1>
@@ -128,7 +131,7 @@ if (data) {
             {/* Profile Picture */}
             <div className="profile-section-card">
               <div className="profile-section-heading">
-                <span className="profile-section-icon"></span>
+                <span className="profile-section-icon">📷</span>
                 <h3>Photo</h3>
               </div>
               <div className="profile-pic-wrapper">
@@ -153,14 +156,37 @@ if (data) {
             {/* About */}
             <div className="profile-section-card profile-section-grow">
               <div className="profile-section-heading">
-                <span className="profile-section-icon"></span>
+                <span className="profile-section-icon">🌿</span>
                 <h3>About You</h3>
               </div>
+
+              {/* First + Last name row */}
+              <div className="profile-name-row">
+                <div className="form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    placeholder="Jane"
+                    value={firstName}
+                    onChange={e => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    placeholder="Smith"
+                    value={lastName}
+                    onChange={e => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
                 <label>Bio</label>
                 <textarea
                   className="profile-textarea"
-                  rows="5"
+                  rows="4"
                   placeholder="Tell your neighbors about yourself..."
                   value={about}
                   onChange={e => setAbout(e.target.value)}
@@ -183,7 +209,6 @@ if (data) {
           {/* Row 2: Education + Employment */}
           <div className="profile-row">
 
-            {/* Education */}
             <div className="profile-section-card profile-section-grow">
               <div className="profile-section-heading">
                 <span className="profile-section-icon">🎓</span>
@@ -209,7 +234,6 @@ if (data) {
               </div>
             </div>
 
-            {/* Employment */}
             <div className="profile-section-card profile-section-grow">
               <div className="profile-section-heading">
                 <span className="profile-section-icon">💼</span>
@@ -237,10 +261,9 @@ if (data) {
 
           </div>
 
-          {/* Save button */}
           <div className="profile-save-row">
             <button className="btn-form-submit profile-save-btn" type="submit" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Profile'}
+              {loading ? 'Saving...' : '💾 Save Profile'}
             </button>
           </div>
 
