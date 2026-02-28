@@ -6,6 +6,30 @@ export default function Homepage() {
   const navigate = useNavigate();
 
   return (
+    <main className="homepage">
+      <div className="button-container">
+        <button 
+          className="auth-btn" 
+          onClick={() => navigate("/signin")}
+        >
+          Sign In
+        </button>
+
+        <button 
+          className="auth-btn" 
+          onClick={() => navigate("/signup")}
+        >
+          Sign Up
+        </button>
+
+        <button 
+          className="auth-btn" 
+          onClick={() => navigate("/UserProfile")}
+        >
+          User Profile
+        </button>
+        
+      </div>
     <>
       <div className="homepage">
 
