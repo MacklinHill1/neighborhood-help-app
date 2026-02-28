@@ -1,96 +1,67 @@
 import React, { useState } from "react";
-import "./SignUp.css";
+import { useNavigate } from "react-router-dom";
+import { supabase } from './supabaseClient';
+import "./Homepage.css";
 
-export default function SignUp() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    password: "",
-    address: "",
-    zipCode: ""
-  });
+export default function Signup() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [zip, setZip] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log(formData);
-  };
+    setLoading(true);
+    setMessage("");
+
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      setMessage(error.message);
+      setLoading(false);
+      return;
+    }
+
+    await supabase.from('profiles').insert({ id: data.user.id, full_name: name, zip_code: zip });
+
+    setMessage('Account created! Check your email to confirm.');
+    setLoading(false);
+    navigate('/signin');
+  }
 
   return (
-    <main>
-      <h2>Create Account</h2>
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <h2 className="modal-title">Join LocAid</h2>
+        <p className="modal-subtitle">Start connecting with your neighborhood</p>
 
-      <form onSubmit={handleSubmit} className="signup-form">
-        
-        <div className="form-group">
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jane Smith" required />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+          </div>
+          <div className="form-group">
+            <label>Area / Zip Code 📍</label>
+            <input type="text" value={zip} onChange={e => setZip(e.target.value)} placeholder="e.g. 90210" required />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+          </div>
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </div>
+          {message && <p className="modal-message">{message}</p>}
 
-        <div className="form-group">
-          <input
-            type="text"
-            name="username"
-            placeholder="Create Username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <input
-            type="password"
-            name="password"
-            placeholder="Create Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={formData.address}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <input
-            type="text"
-            name="zipCode"
-            placeholder="Zip Code"
-            value={formData.zipCode}
-            onChange={handleChange}
-          />
-        </div>
-
-        <button type="submit">Create Account</button>
-      </form>
-    </main>
+          <button className="btn-form-submit" type="submit" disabled={loading}>
+            {loading ? 'Creating account...' : '🌿 Create Account'}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
