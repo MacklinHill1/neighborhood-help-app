@@ -105,6 +105,7 @@ export default function Homepage() {
               <button className="btn-primary-hero" onClick={() => navigate('/board')}>
                 📋 Help Board
               </button>
+              <button className="btn-signup" onClick={() => navigate('/chat')}>💬 Messages</button>
               <button className="btn-secondary-hero" onClick={() => navigate('/profile')}>
                 ✏️ Edit Profile
               </button>

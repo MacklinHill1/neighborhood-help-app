@@ -186,7 +186,21 @@ export default function Chat() {
 
   // --- Render ---
 
-  if (authLoading) return null;
+  if (authLoading) return (
+  <div className="homepage">
+    <div className="bg-shape bg-shape-1" />
+    <div className="bg-shape bg-shape-2" />
+    <div className="bg-shape bg-shape-3" />
+    <nav className="nav">
+      <div className="nav-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        Loc<span>Aid</span> 📍
+      </div>
+    </nav>
+    <div className="profile-page" style={{ textAlign: 'center', paddingTop: '180px' }}>
+      <p style={{ fontFamily: 'Lato, sans-serif', color: 'var(--text-mid)' }}>Loading...</p>
+    </div>
+  </div>
+);
 
   if (!currentUser) {
     return (
