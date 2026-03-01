@@ -124,12 +124,17 @@ export default function Homepage() {
             <div className="feature-card">
               <span className="feature-icon">🛠️</span>
               <h3>Share Your Skills</h3>
-              <p>Offer what you know — cooking, repairs, tutoring — and discover talents in your neighborhood.</p>
+              <p>Offer what you know cooking, repairs, tutoring and discover talents in your neighborhood.</p>
             </div>
             <div className="feature-card">
               <span className="feature-icon">🌿</span>
               <h3>Mutual Aid</h3>
               <p>A giving economy built on trust and reciprocity. Help a neighbor today, get help tomorrow.</p>
+            </div>
+            <div className="feature-card">
+            <span className="feature-icon">💬</span>
+            <h3>Private Messaging</h3>
+             <p>Connect one-on-one with neighbors through direct messages to coordinate help and build trust in your community.</p>
             </div>
           </div>
         </section>
