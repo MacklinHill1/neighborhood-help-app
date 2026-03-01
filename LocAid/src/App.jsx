@@ -24,7 +24,7 @@ function App() {
         <Route path="/user/:id" element={<ViewProfile />} />
         
         {/* Fixed: Removed the crashing supabase.auth.user() call */}
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:id" element={<Chat />} />
       </Routes>
     </Router>
   );
