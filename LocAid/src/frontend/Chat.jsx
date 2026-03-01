@@ -97,8 +97,12 @@ export default function Chat() {
     if (error) { console.error(error); return; }
     setNewMessage("");
 
-    // Refresh sidebar
-    const convos = await fetchConversations(currentUser, paramUserId);
+    // Refresh both messages and sidebar
+    const [msgs, convos] = await Promise.all([
+    fetchMessages(currentUser.id, selectedUser),
+    fetchConversations(currentUser, paramUserId)
+    ]);
+    setMessages(msgs);
     setConversations(convos);
   }
 
