@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./ViewProfile.css";
-
+import Rating from "./RatingComponent.jsx";
 export default function ViewProfile() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -35,6 +35,7 @@ export default function ViewProfile() {
   if (loading) {
     return (
       <div className="homepage">
+        
         <div className="bg-shape bg-shape-1" />
         <div className="bg-shape bg-shape-2" />
         <div className="bg-shape bg-shape-3" />
@@ -42,6 +43,8 @@ export default function ViewProfile() {
           <div className="nav-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             Loc<span>Aid</span> 📍
           </div>
+          
+
         </nav>
         <div className="profile-page" style={{ textAlign: 'center', paddingTop: '180px' }}>
           <p style={{ color: 'var(--text-mid)', fontFamily: 'Lato, sans-serif' }}>Loading profile...</p>
@@ -101,6 +104,9 @@ export default function ViewProfile() {
           {profile.zip_code && (
             <p className="view-location">📍 {profile.zip_code}</p>
           )}
+          {id && (
+  <Rating ratedUserId={id} />
+)}
 
           {/* Message button — only show if logged in and not your own profile */}
           {currentUserId && currentUserId !== id && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./UserProfile.css";
+import "./RatingComponent";
 
 export default function UserProfile() {
   const navigate = useNavigate();
@@ -105,7 +106,7 @@ export default function UserProfile() {
       <div className="bg-shape bg-shape-1" />
       <div className="bg-shape bg-shape-2" />
       <div className="bg-shape bg-shape-3" />
-
+    
       <nav className="nav">
         <div className="nav-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           Loc<span>Aid</span> 📍
