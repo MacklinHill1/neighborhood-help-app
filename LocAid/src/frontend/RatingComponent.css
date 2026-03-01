@@ -1,0 +1,34 @@
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.star-picker {
+  display: flex;
+  gap: 2px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #ccc; /* Gray stars by default */
+  transition: transform 0.1s ease, color 0.2s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.2);
+}
+
+.star-btn.active {
+  color: #ffc107; /* Gold stars when active */
+}
+
+.rating-avg {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+}
